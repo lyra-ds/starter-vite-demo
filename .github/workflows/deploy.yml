@@ -42,3 +42,7 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v5
+        with:
+          # The Pages queue can sit on a deployment for a while; the 10-minute
+          # default aborts it and burns the commit SHA for future retries.
+          timeout: 1800000
