@@ -25,10 +25,16 @@ export function StarterHome() {
     <main className="home" data-brand={brand === 'lyra' ? undefined : brand}>
       <header className="home__hero">
         {/* The mark swaps with the theme, same pattern as the DS Brand component. */}
-        <img className="home__mark" src="/lyra-mark.svg" alt="" width={72} height={72} />
+        <img
+          className="home__mark"
+          src={`${import.meta.env.BASE_URL}lyra-mark.svg`}
+          alt=""
+          width={72}
+          height={72}
+        />
         <img
           className="home__mark home__mark--dark"
-          src="/lyra-mark-light.svg"
+          src={`${import.meta.env.BASE_URL}lyra-mark-light.svg`}
           alt=""
           width={72}
           height={72}

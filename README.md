@@ -1,9 +1,16 @@
-# Lyra DS Vite template
+# Lyra DS Vite template — live demo
 
-A minimal [Vite](https://vite.dev) + React template for
+**▶ [lyra-ds.github.io/starter-vite-demo](https://lyra-ds.github.io/starter-vite-demo/)**
+
+This repository is the deployed demo of the
+[Lyra DS Vite template](https://github.com/lyra-ds/starter-vite): a minimal
+[Vite](https://vite.dev) + React setup for
 [Lyra Design System](https://lyra-ds.dev). It ships the public Lyra styles
 and React packages, local fonts, theme selection (light / dark / system),
 live white-label branding, and ready-to-go lint, test, and CI setup.
+
+Because it is the demo, it keeps the starter home component and the two
+example brands instead of replacing them.
 
 ## Create your project
 
@@ -33,6 +40,19 @@ pnpm dev
 - [ ] Swap `public/favicon.svg` for your favicon.
 - [ ] When you start building, delete `src/components/starter-home.tsx` (and
       its test) and replace `src/App.tsx`.
+
+> In this demo repo the last three items are intentionally left undone — the
+> starter home, the favicon, and the example brands _are_ what the demo shows.
+
+## Deploy
+
+`.github/workflows/deploy.yml` builds on every push to `main` and publishes
+`dist/` to GitHub Pages (Pages source: **GitHub Actions**). A project page is
+served from a sub-path, so `vite.config.ts` sets
+`base: '/starter-vite-demo/'` — change it to your own repo name, or drop it
+if you deploy to a user/organization page or a custom domain. Reference
+files from `public/` with `` `${import.meta.env.BASE_URL}file.svg` `` so they
+resolve under that base.
 
 ## White-label branding
 
