@@ -28,7 +28,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
-      - uses: actions/upload-pages-artifact@v5
+      - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
@@ -40,8 +40,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v5
-        with:
-          # The Pages queue can sit on a deployment for a while; the 10-minute
-          # default aborts it and burns the commit SHA for future retries.
-          timeout: 1800000
+        uses: actions/deploy-pages@v4
