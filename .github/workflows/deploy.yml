@@ -28,6 +28,8 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+      # Stamp the build so the deploy job can verify what the live site serves.
+      - run: echo "$GITHUB_SHA" > dist/version.txt
       - uses: actions/upload-pages-artifact@v5
         with:
           path: dist
@@ -39,5 +41,57 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      # Hand-rolled equivalent of actions/deploy-pages. Pages processing for
+      # this site can exceed that action's hard-capped 10-minute wait
+      # (MAX_TIMEOUT), and on timeout it cancels the deployment, which then
+      # permanently fails that commit SHA. This step waits up to 25 minutes,
+      # never cancels, and also accepts the deployment as soon as the live
+      # site serves this commit's version.txt.
       - id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { owner, repo } = context.repo
+            const sha = context.sha
+            const idToken = await core.getIDToken()
+
+            const { data: artifacts } = await github.rest.actions.listWorkflowRunArtifacts({
+              owner, repo, run_id: context.runId,
+            })
+            const artifact = artifacts.artifacts.find((a) => a.name === 'github-pages')
+            if (!artifact) throw new Error('github-pages artifact not found in this run')
+
+            const { data: deployment } = await github.request(
+              'POST /repos/{owner}/{repo}/pages/deployments',
+              { owner, repo, artifact_id: artifact.id, pages_build_version: sha, oidc_token: idToken },
+            )
+            const deploymentId = deployment.id ?? sha
+            core.info(`Created Pages deployment ${deploymentId} for ${sha}`)
+
+            const pageUrl = deployment.page_url ?? `https://${owner}.github.io/${repo}/`
+            core.setOutput('page_url', pageUrl)
+
+            const deadline = Date.now() + 25 * 60 * 1000
+            const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
+            while (Date.now() < deadline) {
+              const { data: status } = await github.request(
+                'GET /repos/{owner}/{repo}/pages/deployments/{deploymentId}',
+                { owner, repo, deploymentId },
+              )
+              core.info(`Status: ${status.status}`)
+              if (status.status === 'succeed') return
+              if (['deployment_failed', 'deployment_content_failed', 'deployment_cancelled', 'deployment_lost'].includes(status.status)) {
+                throw new Error(`Pages deployment ended in ${status.status}`)
+              }
+              // The status API lags for this site; the live content is the
+              // ground truth, so accept as soon as it serves this build.
+              try {
+                const res = await fetch(`${pageUrl}version.txt`, { cache: 'no-store' })
+                if (res.ok && (await res.text()).trim() === sha) {
+                  core.info('Live site serves this build; deployment is effectively complete.')
+                  return
+                }
+              } catch {}
+              await sleep(15000)
+            }
+            throw new Error('Timed out waiting for the Pages deployment (25 minutes)')
