@@ -1,6 +1,5 @@
-/// <reference types="vitest/config" />
-import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { configDefaults, defineConfig } from 'vitest/config'
 
 export default defineConfig({
   // Served from https://lyra-ds.github.io/starter-vite-demo/ — a project page
@@ -10,6 +9,6 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
-    exclude: ['node_modules/**', 'dist/**'],
+    exclude: [...configDefaults.exclude, 'dist/**', '**/.batuta/**'],
   },
 })
