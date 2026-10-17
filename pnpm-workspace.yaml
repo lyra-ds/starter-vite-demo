@@ -1,5 +1,5 @@
 allowBuilds:
   esbuild: true
 minimumReleaseAgeExclude:
-  - '@lyra-ds/react@1.1.0'
-  - '@lyra-ds/styles@1.1.0'
+  - '@lyra-ds/react@1.1.0 || 2.0.0'
+  - '@lyra-ds/styles@1.1.0 || 1.2.0'
