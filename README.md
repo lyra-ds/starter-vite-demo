@@ -12,6 +12,24 @@ live white-label branding, and ready-to-go lint, test, and CI setup.
 Because it is the demo, it keeps the starter home component and the two
 example brands instead of replacing them.
 
+## Lyra compatibility
+
+This starter pairs `@lyra-ds/react` 2.0.0 with `@lyra-ds/styles` 1.2.0.
+React and ReactDOM peers remain `>=18 <20`; this update does not upgrade
+React or Vite. The current starter does not mount `ToastProvider`.
+
+If you add `ToastProvider`, info and success toasts now default to 8000 ms,
+while error/danger toasts persist. Hover and focus independently pause the
+remaining time. Set `<ToastProvider duration={4000}>` to restore previous
+timing for every tone. Explicit per-toast durations take precedence over
+provider configuration, including `duration: 0` to keep a toast persistent
+(including messages with actions). Later provider configuration applies
+only to newly queued toasts. The additive sidebar and tooltip APIs need no
+adoption here.
+
+To roll back, restore both previous manifest ranges (`^1.1.0` for each
+Lyra package) and the previous lockfile. No data migration is needed.
+
 ## Create your project
 
 Click **Use this template** on GitHub, or:
